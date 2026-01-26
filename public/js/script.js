@@ -2,9 +2,9 @@ const menuToggle = document.getElementById("menuToggle");
 const navLinks = document.getElementById("navLinks");
 
 menuToggle.addEventListener("click", () => {
-  navLinks.classList.toggle("open");
+  navLinks.classList.toggle("show");
 
-  const isOpen = navLinks.classList.contains("open");
+  const isOpen = navLinks.classList.contains("show");
   menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
 });
 
@@ -15,3 +15,11 @@ navLinks.addEventListener("click", (e) => {
     menuToggle.setAttribute("aria-expanded", "false");
   }
 });
+
+function openCvPopup() {
+  document.getElementById("cvPopup").style.display = "flex";
+}
+
+function closeCvPopup() {
+  document.getElementById("cvPopup").style.display = "none";
+}
