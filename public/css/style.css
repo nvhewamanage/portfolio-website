@@ -1,7 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
 
 body {
@@ -52,10 +65,11 @@ header {
 
 /* Page Body */
 .page-body {
+  flex: 1;
   padding: 3rem 2rem;
   text-align: center;
   background: #f9f9f9;
-  min-height: 70vh;
+  min-height: auto;
 }
 
 .page-body h1 {
@@ -114,6 +128,7 @@ ul {
 }
 
 .footer {
+  margin-top: auto; /* Pushes the footer to the bottom of the page */
     background-color: #000000; /* Dark background */
     padding: 40px 0;
     color: white;
