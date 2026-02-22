@@ -1,41 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Portfolio UI</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-    <header>
-        <nav class="navbar">
-            <div class="logo">MyBrand</div>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/services">Services</a></li>
-                <li><a href="/contact">Contact</a></li>
-            </ul>
-            <div class="menu-toggle" id="menuToggle">&#9776;</div>
-        </nav>
-    </header>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#home">
+        <span class="brand-mark"></span>
+        <span class="brand-text">LOGO</span>
+      </a>
 
-    <main class="page-body">
-        <section>
-            <h1>Welcome to My Website</h1>
-            <p>This is a clean and responsive webpage layout built using Express and Handlebars.</p>
-            <h2>My name is {{name}}</h2>
-        </section>
-    </main>
+      <nav class="nav" id="nav">
+        <a class="nav-link active" href="#home">Home</a>
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#services">Services</a>
+        <a class="nav-link" href="#portfolio">Portfolio</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#contact">Contact</a>
+      </nav>
 
+      <div class="topbar-right">
+        <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">
+          EN
+        </button>
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page shell -->
+  <main class="shell">
+
+    <!-- HOME (Hero) -->
+    <section class="panel hero" id="home">
+      <div class="hero-grid">
+        <div class="hero-left">
+          <p class="hello" data-i18n="hello">Hello</p>
+
+          <h1 class="title">
+            <span data-i18n="im">I’m</span>
+            <span class="accent" data-i18n="name">James</span>
+            <span data-i18n="surname">Kamerun</span>
+          </h1>
+
+          <p class="subtitle" data-i18n="subtitle">
+            In this video I am gonna show you how to create a personal website with all pages.
+            After watching this tutorial you will be able to create a website like this.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn" href="#" download data-i18n="download">Download CV</a>
+            <a class="btn btn-ghost" href="#portfolio" data-i18n="viewwork">View Work</a>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <!-- Replace with your image: images/profile.png -->
+          <div class="profile-wrap">
+            <img
+              class="profile-img"
+              src="user.png"
+              alt="Profile"
+            />
+          </div>
+        </div>
+      </div>
+
+      <a class="scroll-down" href="#about" aria-label="Scroll down">
+        <span class="scroll-line"></span>
+        <span class="scroll-dot"></span>
+      </a>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="panel" id="about">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="aboutTitle">About</h2>
+        <p class="section-desc" data-i18n="aboutDesc">
+          A short intro about who you are, what you do, and what you’re focused on.
+        </p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3 data-i18n="aboutCard1Title">Who I am</h3>
+          <p data-i18n="aboutCard1Text">
+            I’m a UI/UX focused developer who builds clean, modern websites and web apps.
+            I care about details, smooth interactions, and performance.
+          </p>
+          <ul class="list">
+            <li><strong data-i18n="locationLabel">Location:</strong> <span data-i18n="locationValue">Sri Lanka</span></li>
+            <li><strong data-i18n="emailLabel">Email:</strong> <span>you@example.com</span></li>
+            <li><strong data-i18n="phoneLabel">Phone:</strong> <span>+94 00 000 0000</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 data-i18n="skillsTitle">Skills</h3>
+          <div class="skills">
+            <div class="skill">
+              <span>HTML/CSS</span>
+              <div class="bar"><span style="width: 92%"></span></div>
+            </div>
+            <div class="skill">
+              <span>JavaScript</span>
+              <div class="bar"><span style="width: 85%"></span></div>
+            </div>
+            <div class="skill">
+              <span>UI Design</span>
+              <div class="bar"><span style="width: 80%"></span></div>
+            </div>
+            <div class="skill">
+              <span>Flutter</span>
+              <div class="bar"><span style="width: 70%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="panel" id="services">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="servicesTitle">Services</h2>
+        <p class="section-desc" data-i18n="servicesDesc">
+          What I can do for you (customize these cards as you like).
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <article class="card service">
+          <div class="icon">✦</div>
+          <h3 data-i18n="service1Title">Web Design</h3>
+          <p data-i18n="service1Text">Modern UI layout, responsive design, and clean typography.</p>
+        </article>
+
+        <article class="card service">
+          <div class="icon">⚡</div>
+          <h3 data-i18n="service2Title">Web Development</h3>
+          <p data-i18n="service2Text">Fast, accessible, and maintainable websites with smooth interactions.</p>
+        </article>
+
+        <article class="card service">
+          <div class="icon">☁</div>
+          <h3 data-i18n="service3Title">Deploy & Support</h3>
+          <p data-i18n="service3Text">Domain, hosting, deployment, and post-launch updates.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section class="panel" id="portfolio">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="portfolioTitle">Portfolio</h2>
+        <p class="section-desc" data-i18n="portfolioDesc">
+          A few sample projects. Replace thumbnails and links with your real work.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <a class="card project" href="#" target="_blank" rel="noreferrer">
+          <div class="thumb"></div>
+          <div class="project-meta">
+            <h3>Landing Page</h3>
+            <p>HTML • CSS • JS</p>
+          </div>
+        </a>
+
+        <a class="card project" href="#" target="_blank" rel="noreferrer">
+          <div class="thumb"></div>
+          <div class="project-meta">
+            <h3>Admin Dashboard</h3>
+            <p>UI • Components</p>
+          </div>
+        </a>
+
+        <a class="card project" href="#" target="_blank" rel="noreferrer">
+          <div class="thumb"></div>
+          <div class="project-meta">
+            <h3>Portfolio Site</h3>
+            <p>Responsive • Clean</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="panel" id="experience">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="experienceTitle">Experience</h2>
+        <p class="section-desc" data-i18n="experienceDesc">
+          Your timeline (education / work). Edit the items below.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="time-item card">
+          <div class="time-top">
+            <span class="pill">2024 - 2026</span>
+            <h3>Front-End Developer</h3>
+          </div>
+          <p>Built responsive websites, improved UI performance, and developed reusable components.</p>
+        </div>
+
+        <div class="time-item card">
+          <div class="time-top">
+            <span class="pill">2023 - 2024</span>
+            <h3>UI Designer</h3>
+          </div>
+          <p>Designed landing pages and dashboards with a focus on clarity and conversion.</p>
+        </div>
+
+        <div class="time-item card">
+          <div class="time-top">
+            <span class="pill">2022 - 2023</span>
+            <h3>Student / Intern</h3>
+          </div>
+          <p>Worked on academic projects: Java EE systems, Flutter apps, and web layouts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="panel" id="contact">
+      <div class="section-head">
+        <h2 class="section-title" data-i18n="contactTitle">Contact</h2>
+        <p class="section-desc" data-i18n="contactDesc">
+          Send a message (demo form). You can connect it to PHP / Node later.
+        </p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3 data-i18n="contactInfoTitle">Contact Info</h3>
+          <p><strong>Email:</strong> you@example.com</p>
+          <p><strong>Phone:</strong> +94 00 000 0000</p>
+          <p><strong>Address:</strong> Colombo, Sri Lanka</p>
+
+          <div class="social">
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">gh</a>
+            <a href="#" aria-label="Dribbble">db</a>
+          </div>
+        </div>
+
+        <form class="card form" id="contactForm">
+          <div class="row">
+            <div class="field">
+              <label for="name" data-i18n="formName">Name</label>
+              <input id="name" name="name" type="text" placeholder="Your name" required />
+            </div>
+            <div class="field">
+              <label for="email" data-i18n="formEmail">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@email.com" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="subject" data-i18n="formSubject">Subject</label>
+            <input id="subject" name="subject" type="text" placeholder="Project / Question" required />
+          </div>
+
+          <div class="field">
+            <label for="message" data-i18n="formMessage">Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+          </div>
+
+          <button class="btn" type="submit" data-i18n="formSend">Send Message</button>
+          <p class="form-note" id="formNote" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
 
     <footer class="footer">
-        <div class="rowena">
-            <p class="par">&copy; 2026 MyBrand | All Rights Reserved</p>
-        </div>
+      <p>© <span id="year"></span> Your Name. All rights reserved.</p>
     </footer>
+  </main>
 
-    <script src="/js/script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
