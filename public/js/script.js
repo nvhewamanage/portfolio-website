@@ -1,156 +1,105 @@
-// Mobile menu
-const menuBtn = document.getElementById("menuBtn");
-const nav = document.getElementById("nav");
-menuBtn.addEventListener("click", () => nav.classList.toggle("open"));
+// ── Navbar scroll effect ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+    highlightNav();
+  });
 
-// Close menu when clicking a link (mobile)
-document.querySelectorAll(".nav-link").forEach(link => {
-  link.addEventListener("click", () => nav.classList.remove("open"));
-});
+  // ── Active section highlight ──
+  const sections = ['home','about','gallery','blog','updates','contact'];
+  function highlightNav() {
+    let current = 'home';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 100) current = id;
+    });
+    document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+      link.classList.toggle('active', link.dataset.section === current);
+    });
+  }
 
-// Active link on scroll
-const sections = [...document.querySelectorAll("section[id]")];
-const navLinks = [...document.querySelectorAll(".nav-link")];
+  // ── Mobile hamburger ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  let menuOpen = false;
 
-function setActiveLink() {
-  const y = window.scrollY + 120;
-  let currentId = "home";
+  hamburger.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    mobileMenu.style.transform = menuOpen ? 'translateY(0)' : 'translateY(-110%)';
+    const spans = hamburger.querySelectorAll('span');
+    if (menuOpen) {
+      spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+    } else {
+      spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+    }
+  });
 
-  for (const sec of sections) {
-    const top = sec.offsetTop;
-    const height = sec.offsetHeight;
-    if (y >= top && y < top + height) {
-      currentId = sec.id;
-      break;
+  function closeMobile() {
+    menuOpen = false;
+    mobileMenu.style.transform = 'translateY(-110%)';
+    hamburger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+  }
+
+  // ── Gallery filter ──
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        const match = f === 'all' || item.dataset.cat === f;
+        item.style.opacity = match ? '1' : '0.2';
+        item.style.transform = match ? '' : 'scale(0.96)';
+        item.style.pointerEvents = match ? '' : 'none';
+      });
+    });
+  });
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ── Contact form ──
+  function submitContactForm(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const subject = document.getElementById('subject').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    if (!name || !email || !subject || !message) {
+      document.querySelectorAll('.contact-input').forEach(inp => {
+        if (!inp.value.trim()) { inp.style.borderColor = '#e8154a'; setTimeout(() => inp.style.borderColor = '', 2000); }
+      });
+      return;
+    }
+
+    // Show success
+    const successEl = document.getElementById('formSuccess');
+    document.getElementById('successMsg').textContent = `Thanks ${name}! Your message has been sent. I'll get back to you soon.`;
+    successEl.classList.remove('hidden');
+    document.getElementById('contactForm').reset();
+
+    // Scroll to success message
+    successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── Newsletter ──
+  function subscribeNewsletter() {
+    const input = document.getElementById('newsletterEmail');
+    const msg = document.getElementById('newsletterMsg');
+    if (input.value && input.value.includes('@')) {
+      document.getElementById('newsletterForm').innerHTML = `<p class="text-green-400 font-medium text-sm w-full text-center py-1">🎉 You're in! Welcome to the Sunday letter.</p>`;
+    } else {
+      input.style.outline = '2px solid #e8154a';
+      input.placeholder = 'Please enter a valid email';
+      setTimeout(() => { input.style.outline = ''; input.placeholder = 'your@email.com'; }, 2000);
     }
   }
-
-  navLinks.forEach(a => {
-    a.classList.toggle("active", a.getAttribute("href") === `#${currentId}`);
-  });
-}
-window.addEventListener("scroll", setActiveLink);
-setActiveLink();
-
-// Footer year
-document.getElementById("year").textContent = new Date().getFullYear();
-
-// Contact form (demo)
-const form = document.getElementById("contactForm");
-const note = document.getElementById("formNote");
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  note.textContent = "Message sent (demo). Connect this form to your backend to receive emails.";
-  form.reset();
-});
-
-// Simple language toggle (EN <-> ES demo)
-const langBtn = document.getElementById("langBtn");
-let lang = "EN";
-
-const dict = {
-  EN: {
-    hello: "Hello",
-    im: "I’m",
-    name: "James",
-    surname: "Kamerun",
-    subtitle:
-      "In this video I am gonna show you how to create a personal website with all pages. After watching this tutorial you will be able to create a website like this.",
-    download: "Download CV",
-    viewwork: "View Work",
-
-    aboutTitle: "About",
-    aboutDesc: "A short intro about who you are, what you do, and what you’re focused on.",
-    aboutCard1Title: "Who I am",
-    aboutCard1Text:
-      "I’m a UI/UX focused developer who builds clean, modern websites and web apps. I care about details, smooth interactions, and performance.",
-    locationLabel: "Location:",
-    locationValue: "Sri Lanka",
-    emailLabel: "Email:",
-    phoneLabel: "Phone:",
-    skillsTitle: "Skills",
-
-    servicesTitle: "Services",
-    servicesDesc: "What I can do for you (customize these cards as you like).",
-    service1Title: "Web Design",
-    service1Text: "Modern UI layout, responsive design, and clean typography.",
-    service2Title: "Web Development",
-    service2Text: "Fast, accessible, and maintainable websites with smooth interactions.",
-    service3Title: "Deploy & Support",
-    service3Text: "Domain, hosting, deployment, and post-launch updates.",
-
-    portfolioTitle: "Portfolio",
-    portfolioDesc: "A few sample projects. Replace thumbnails and links with your real work.",
-
-    experienceTitle: "Experience",
-    experienceDesc: "Your timeline (education / work). Edit the items below.",
-
-    contactTitle: "Contact",
-    contactDesc: "Send a message (demo form). You can connect it to PHP / Node later.",
-    contactInfoTitle: "Contact Info",
-    formName: "Name",
-    formEmail: "Email",
-    formSubject: "Subject",
-    formMessage: "Message",
-    formSend: "Send Message",
-  },
-  ES: {
-    hello: "Hola",
-    im: "Soy",
-    name: "James",
-    surname: "Kamerun",
-    subtitle:
-      "En este video te mostraré cómo crear un sitio personal con todas las secciones. Después podrás crear un sitio como este.",
-    download: "Descargar CV",
-    viewwork: "Ver trabajos",
-
-    aboutTitle: "Sobre mí",
-    aboutDesc: "Una breve introducción sobre quién eres y en qué trabajas.",
-    aboutCard1Title: "Quién soy",
-    aboutCard1Text:
-      "Soy un desarrollador enfocado en UI/UX que crea sitios modernos y rápidos. Me importan los detalles y el rendimiento.",
-    locationLabel: "Ubicación:",
-    locationValue: "Sri Lanka",
-    emailLabel: "Correo:",
-    phoneLabel: "Teléfono:",
-    skillsTitle: "Habilidades",
-
-    servicesTitle: "Servicios",
-    servicesDesc: "Lo que puedo hacer por ti (personaliza estas tarjetas).",
-    service1Title: "Diseño Web",
-    service1Text: "Diseño moderno, responsive y tipografía limpia.",
-    service2Title: "Desarrollo Web",
-    service2Text: "Sitios rápidos, accesibles y fáciles de mantener.",
-    service3Title: "Despliegue y soporte",
-    service3Text: "Dominio, hosting, despliegue y actualizaciones.",
-
-    portfolioTitle: "Portafolio",
-    portfolioDesc: "Proyectos de ejemplo. Reemplaza miniaturas y enlaces.",
-
-    experienceTitle: "Experiencia",
-    experienceDesc: "Tu línea de tiempo (educación / trabajo).",
-
-    contactTitle: "Contacto",
-    contactDesc: "Enviar mensaje (formulario demo). Conéctalo a backend luego.",
-    contactInfoTitle: "Información",
-    formName: "Nombre",
-    formEmail: "Correo",
-    formSubject: "Asunto",
-    formMessage: "Mensaje",
-    formSend: "Enviar",
-  }
-};
-
-function applyLang(which) {
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    const value = dict[which]?.[key];
-    if (value) el.textContent = value;
-  });
-}
-
-langBtn.addEventListener("click", () => {
-  lang = (lang === "EN") ? "ES" : "EN";
-  langBtn.textContent = lang;
-  applyLang(lang);
-});
