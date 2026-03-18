@@ -58,7 +58,7 @@
       box-shadow: 0 2px 20px rgba(26,26,46,.08);
     }
     .nav-wrap {
-      max-width: 1280px;
+      max-width: 1344px;
       margin: 0 auto;
       height: 100%;
       padding: 0 48px;
@@ -115,7 +115,7 @@
        ============================================================ */
     section {
       padding: calc(var(--nav-h) + 70px) 80px 90px;
-      max-width: 1280px;
+      max-width: 1344px;
       margin: 0 auto;
     }
     .full-bleed {
@@ -1198,35 +1198,116 @@
 
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  /* Contact form */
-  document.getElementById('theForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const inputs = this.querySelectorAll('[required]');
-    let ok = true;
-    inputs.forEach(inp => {
-      if (!inp.value.trim()) {
-        ok = false;
-        inp.style.borderColor = '#e8154a';
-        inp.addEventListener('input', () => inp.style.borderColor = '', { once: true });
-      }
-    });
-    if (!ok) return;
-    const msg = document.getElementById('form-success');
-    msg.style.display = 'flex';
-    this.style.display = 'none';
+   /* CONTACT FORM */
+document.getElementById('theForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const form = this;
+  const inputs = form.querySelectorAll('[required]');
+  let ok = true;
+
+  inputs.forEach(inp => {
+    if (!inp.value.trim()) {
+      ok = false;
+      inp.style.borderColor = '#e8154a';
+      inp.addEventListener('input', () => inp.style.borderColor = '', { once: true });
+    }
   });
 
-  /* Newsletter */
-  function handleNewsletter() {
-    const inp = document.getElementById('nlEmail');
-    if (inp.value && inp.value.includes('@')) {
-      document.getElementById('nlForm').style.display   = 'none';
-      document.getElementById('nlThanks').style.display = 'block';
+  if (!ok) return;
+
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = 'Sending… <i class="fa-solid fa-spinner fa-spin"></i>';
+
+  try {
+    const res = await fetch('/send-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('fname').value.trim(),
+        email: document.getElementById('femail').value.trim(),
+        subject: document.getElementById('fsubject').value.trim(),
+        message: document.getElementById('fmessage').value.trim(),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('form-success').style.display = 'flex';
+      form.reset();
+      form.style.display = 'none';
+
+      // ⏱ RESET AFTER 5 SECONDS
+      setTimeout(() => {
+        document.getElementById('form-success').style.display = 'none';
+        form.style.display = 'block';
+
+        btn.disabled = false;
+        btn.innerHTML = 'Send Message <i class="fa-solid fa-paper-plane"></i>';
+      }, 5000);
+
     } else {
-      inp.style.outline = '2px solid #e8154a';
-      setTimeout(() => inp.style.outline = '', 1400);
+      btn.disabled = false;
+      btn.innerHTML = 'Send Message <i class="fa-solid fa-paper-plane"></i>';
+      alert('Sorry, something went wrong. Please try again later.');
     }
+
+  } catch {
+    btn.disabled = false;
+    btn.innerHTML = 'Send Message <i class="fa-solid fa-paper-plane"></i>';
+    alert('Network error. Please check your connection and try again.');
   }
+});
+
+
+/* NEWSLETTER */
+async function handleNewsletter(){
+
+  const emailInput = document.getElementById("nlEmail");
+  const formDiv = document.getElementById("nlForm");
+  const thanksMsg = document.getElementById("nlThanks");
+
+  const email = emailInput.value.trim();
+
+  if(!email){
+    emailInput.style.borderColor = '#e8154a';
+    emailInput.addEventListener('input', () => emailInput.style.borderColor = '', { once: true });
+    return;
+  }
+
+  try {
+    const res = await fetch("/subscribe",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({email})
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+
+      formDiv.style.display = "none";
+      thanksMsg.style.display = "block";
+      emailInput.value = "";
+
+      // ⏱ RESET AFTER 5 SECONDS
+      setTimeout(() => {
+        formDiv.style.display = "flex";
+        thanksMsg.style.display = "none";
+      }, 5000);
+
+    } else {
+      alert("Subscription failed. Please try again.");
+    }
+
+  } catch {
+    alert("Network error. Please try again.");
+  }
+}
 
   /* Back to top + Let's Talk */
   const backToTop = document.getElementById('backToTop');
