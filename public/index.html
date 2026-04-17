@@ -785,6 +785,96 @@
       box-shadow: 0 6px 24px rgba(232,21,74,.35);
       transform: translateY(-3px);
     }
+    /* ============================================================
+       GALLERY POPUP MODAL
+       ============================================================ */
+    .g-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,26,46,.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .g-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .g-modal {
+      background: var(--white);
+      border-radius: 20px;
+      max-width: 640px; width: 100%;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(26,26,46,.3);
+      transform: scale(.93);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .g-modal-overlay.open .g-modal { transform: scale(1); }
+    .g-modal-thumb {
+      width: 100%; height: 320px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px; color: rgba(255,255,255,.8);
+    }
+    .g-modal-body { padding: 24px 28px 28px; }
+    .g-modal-body h3 { font-family: var(--fd); font-size: 22px; color: var(--dark); margin-bottom: 6px; }
+    .g-modal-body .g-modal-cat { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
+    .g-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.15); border: none;
+      border-radius: 50%; color: #fff; font-size: 18px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background var(--ease);
+    }
+    .g-modal-close:hover { background: rgba(255,255,255,.3); }
+
+    /* ============================================================
+       BLOG POST POPUP MODAL
+       ============================================================ */
+    .blog-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,26,46,.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .blog-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .blog-modal {
+      background: var(--white);
+      border-radius: 20px;
+      max-width: 680px; width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 32px 80px rgba(26,26,46,.3);
+      transform: scale(.93);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .blog-modal-overlay.open .blog-modal { transform: scale(1); }
+    .blog-modal-hero {
+      width: 100%; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px; color: rgba(255,255,255,.8);
+      flex-shrink: 0;
+    }
+    .blog-modal-body { padding: 32px; }
+    .blog-modal-body .btag { margin-bottom: 12px; }
+    .blog-modal-body h2 { font-family: var(--fd); font-size: 26px; color: var(--dark); line-height: 1.3; margin-bottom: 16px; }
+    .blog-modal-body .bc-meta { margin-bottom: 24px; }
+    .blog-modal-body .post-content { font-size: 15px; line-height: 1.85; color: var(--muted); }
+    .blog-modal-body .post-content p { margin-bottom: 16px; }
+    .blog-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.15); border: none;
+      border-radius: 50%; color: #fff; font-size: 18px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background var(--ease);
+    }
+    .blog-modal-close:hover { background: rgba(255,255,255,.3); }
   </style>
 </head>
 <body>
@@ -820,16 +910,15 @@
       <div class="sw-label">Find me on</div>
       <div class="sw-links">
         <a href="#" class="sw-pill"><i class="fa-brands fa-instagram"></i> Instagram</a>
-        <a href="#" class="sw-pill"><i class="fa-brands fa-x-twitter"></i> Twitter</a>
+        <a href="#" class="sw-pill"><i class="fa-brands fa-x"></i> Twitter</a>
         <a href="#" class="sw-pill"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a>
-        <a href="#" class="sw-pill"><i class="fa-brands fa-github"></i> GitHub</a>
+        <a href="#" class="sw-pill"><i class="fa-brands fa-facebook"></i> Facebook</a>
       </div>
     </div>
   </div>
   <div class="hero-img-wrap">
     <div class="brush"></div>
-    <img src="images/profile.png" alt="Chanuka Nimsara" class="hero-photo"
-         onerror="this.style.display='none'"/>
+    <img src="/images/profile.png" alt="Chanuka Nimsara" class="hero-photo"/>
     <div class="scroll-hint" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
       <i class="fa-solid fa-chevron-down"></i>
     </div>
@@ -841,8 +930,7 @@
   <div class="about-img-col reveal">
     <div class="about-img-wrap">
       <div class="about-brush"></div>
-      <img src="images/profile.png" alt="Chanuka Nimsara" class="about-photo"
-           onerror="this.style.display='none'"/>
+      <img src="/images/profile.png" alt="Chanuka Nimsara" class="about-photo"/>
     </div>
   </div>
   <div class="about-col">
@@ -858,9 +946,9 @@
       in the kitchen, or deep in a good book. This website is where I document the journey.
     </p>
     <div class="about-facts reveal">
-      <div class="fact"><span class="fact-n">12+</span><span class="fact-l">Years journaling</span></div>
-      <div class="fact"><span class="fact-n">340</span><span class="fact-l">Blog posts written</span></div>
-      <div class="fact"><span class="fact-n">28</span><span class="fact-l">Countries visited</span></div>
+      <div class="fact"><span class="fact-n">0+</span><span class="fact-l">Years journaling</span></div>
+      <div class="fact"><span class="fact-n">0</span><span class="fact-l">Blog posts written</span></div>
+      <div class="fact"><span class="fact-n">0</span><span class="fact-l">Countries visited</span></div>
     </div>
     <a href="#contact" class="btn reveal">Get In Touch</a>
   </div>
@@ -881,35 +969,35 @@
     <button class="gf" data-f="urban">Urban</button>
   </div>
   <div class="g-grid">
-    <div class="g-item reveal" data-c="travel">
+    <div class="g-item reveal" data-c="travel" onclick="openGalleryModal(this)" data-title="Mountain Trails" data-cat="Travel" data-bg="linear-gradient(135deg,#e8d5c4,#c9a98d)" data-icon="fa-mountain-sun">
       <div class="g-ph" style="background:linear-gradient(135deg,#e8d5c4,#c9a98d)"><i class="fa-solid fa-mountain-sun"></i><span>Mountain Trails</span></div>
       <div class="g-ov"><p>Mountain Trails</p><span>Travel</span></div>
     </div>
-    <div class="g-item g-item--tall reveal" data-c="portrait">
+    <div class="g-item g-item--tall reveal" data-c="portrait" onclick="openGalleryModal(this)" data-title="Golden Hour" data-cat="Portrait" data-bg="linear-gradient(135deg,#c4d8e8,#8dafc9)" data-icon="fa-user">
       <div class="g-ph" style="background:linear-gradient(135deg,#c4d8e8,#8dafc9)"><i class="fa-solid fa-user"></i><span>Golden Hour</span></div>
       <div class="g-ov"><p>Golden Hour</p><span>Portrait</span></div>
     </div>
-    <div class="g-item reveal" data-c="urban">
+    <div class="g-item reveal" data-c="urban" onclick="openGalleryModal(this)" data-title="City Lights" data-cat="Urban" data-bg="linear-gradient(135deg,#d4e8c4,#9dc98d)" data-icon="fa-city">
       <div class="g-ph" style="background:linear-gradient(135deg,#d4e8c4,#9dc98d)"><i class="fa-solid fa-city"></i><span>City Lights</span></div>
       <div class="g-ov"><p>City Lights</p><span>Urban</span></div>
     </div>
-    <div class="g-item g-item--wide reveal" data-c="nature">
+    <div class="g-item g-item--wide reveal" data-c="nature" onclick="openGalleryModal(this)" data-title="Morning Mist" data-cat="Nature" data-bg="linear-gradient(135deg,#e8c4d8,#c98db8)" data-icon="fa-leaf">
       <div class="g-ph" style="background:linear-gradient(135deg,#e8c4d8,#c98db8)"><i class="fa-solid fa-leaf"></i><span>Morning Mist</span></div>
       <div class="g-ov"><p>Morning Mist</p><span>Nature</span></div>
     </div>
-    <div class="g-item reveal" data-c="travel">
+    <div class="g-item reveal" data-c="travel" onclick="openGalleryModal(this)" data-title="Coastal Roads" data-cat="Travel" data-bg="linear-gradient(135deg,#e8e4c4,#c9c38d)" data-icon="fa-plane">
       <div class="g-ph" style="background:linear-gradient(135deg,#e8e4c4,#c9c38d)"><i class="fa-solid fa-plane"></i><span>Coastal Roads</span></div>
       <div class="g-ov"><p>Coastal Roads</p><span>Travel</span></div>
     </div>
-    <div class="g-item reveal" data-c="nature">
+    <div class="g-item reveal" data-c="nature" onclick="openGalleryModal(this)" data-title="Still Waters" data-cat="Nature" data-bg="linear-gradient(135deg,#c4e8e4,#8dc9c3)" data-icon="fa-water">
       <div class="g-ph" style="background:linear-gradient(135deg,#c4e8e4,#8dc9c3)"><i class="fa-solid fa-water"></i><span>Still Waters</span></div>
       <div class="g-ov"><p>Still Waters</p><span>Nature</span></div>
     </div>
-    <div class="g-item reveal" data-c="urban">
+    <div class="g-item reveal" data-c="urban" onclick="openGalleryModal(this)" data-title="Street Art" data-cat="Urban" data-bg="linear-gradient(135deg,#d8c4e8,#b38dc9)" data-icon="fa-building">
       <div class="g-ph" style="background:linear-gradient(135deg,#d8c4e8,#b38dc9)"><i class="fa-solid fa-building"></i><span>Street Art</span></div>
       <div class="g-ov"><p>Street Art</p><span>Urban</span></div>
     </div>
-    <div class="g-item reveal" data-c="portrait">
+    <div class="g-item reveal" data-c="portrait" onclick="openGalleryModal(this)" data-title="Candid Moments" data-cat="Portrait" data-bg="linear-gradient(135deg,#e8c4c4,#c98d8d)" data-icon="fa-face-smile">
       <div class="g-ph" style="background:linear-gradient(135deg,#e8c4c4,#c98d8d)"><i class="fa-solid fa-face-smile"></i><span>Candid Moments</span></div>
       <div class="g-ov"><p>Candid Moments</p><span>Portrait</span></div>
     </div>
@@ -925,7 +1013,22 @@
   </div>
   <div class="blog-grid">
     <!-- featured -->
-    <article class="bc bc--feat reveal">
+    <article class="bc bc--feat reveal"
+      data-tag="Life"
+      data-title="The Art of Slowing Down in a Fast World"
+      data-date="Feb 15, 2026" data-read="6 min read"
+      data-bg="linear-gradient(135deg,#f5e6d3,#e8c9a0)" data-icon="fa-pen-nib"
+      data-content="We live in an age that glorifies busyness. But what happens when we dare to pause and simply breathe?
+
+I spent a month offline — no social media, no notifications, no 24-hour news cycle. What I found surprised me.
+
+The first week was difficult. My hands kept reaching for my phone, muscle memory betraying me at every quiet moment. But by week two, something shifted. I started noticing things again — the way morning light falls across the kitchen floor, the sound of rain on leaves, the feeling of having nowhere to be.
+
+Slowing down isn't about being unproductive. It's about being intentional. Every task done with full presence becomes richer. Every conversation becomes deeper when you're not half-distracted by a screen.
+
+If you've been feeling overwhelmed, I'd invite you to try it — even for a weekend. Turn off notifications. Go for a walk without your phone. Cook a meal slowly. Watch the world without needing to document it.
+
+You might be surprised by what you find in the silence.">
       <div class="bc-thumb" style="background:linear-gradient(135deg,#f5e6d3,#e8c9a0)"><i class="fa-solid fa-pen-nib"></i></div>
       <div class="bc-body">
         <span class="btag">Life</span>
@@ -935,11 +1038,24 @@
           <span><i class="fa-regular fa-calendar"></i> Feb 15, 2026</span>
           <span><i class="fa-regular fa-clock"></i> 6 min read</span>
         </div>
-        <a href="#" class="bc-more">Read more <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#" class="bc-more" onclick="openBlogModal(this.closest('article'));return false;">Read more <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </article>
     <!-- card 2 -->
-    <article class="bc reveal">
+    <article class="bc reveal"
+      data-tag="Photography"
+      data-title="What My Camera Taught Me About Patience"
+      data-date="Jan 30, 2026" data-read="4 min read"
+      data-bg="linear-gradient(135deg,#d3e6f5,#a0c9e8)" data-icon="fa-camera"
+      data-content="Great shots rarely happen instantly. They're earned through waiting, watching, and learning to see the world differently.
+
+Photography taught me that patience isn't passive — it's an active, alert form of attention. You position yourself, you wait, and you stay ready for the moment that everything aligns.
+
+I remember spending three hours at a train station waiting for the light to hit a particular archway just right. Most people would have given up after thirty minutes. But I'd learned that the best shots live just beyond the point where most people stop waiting.
+
+This applies to so much more than photography. In relationships, we want connection to be instant. In careers, we want recognition now. But the most meaningful things — a career you love, a skill mastered, a relationship deepened — take time.
+
+Your camera is a teacher in patience, in presence, and in learning to see beauty in ordinary moments.">
       <div class="bc-thumb" style="background:linear-gradient(135deg,#d3e6f5,#a0c9e8)"><i class="fa-solid fa-camera"></i></div>
       <div class="bc-body">
         <span class="btag">Photography</span>
@@ -949,11 +1065,26 @@
           <span><i class="fa-regular fa-calendar"></i> Jan 30, 2026</span>
           <span><i class="fa-regular fa-clock"></i> 4 min read</span>
         </div>
-        <a href="#" class="bc-more">Read more <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#" class="bc-more" onclick="openBlogModal(this.closest('article'));return false;">Read more <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </article>
     <!-- card 3 -->
-    <article class="bc reveal">
+    <article class="bc reveal"
+      data-tag="Travel"
+      data-title="Hidden Gems: Towns You'll Never Find on Lists"
+      data-date="Jan 10, 2026" data-read="8 min read"
+      data-bg="linear-gradient(135deg,#e6f5d3,#c9e8a0)" data-icon="fa-map-location-dot"
+      data-content="Every traveler dreams of discovering places untouched by tourism. Here are five of my most cherished off-the-radar destinations.
+
+The first is a small fishing village on the coast of Portugal — no tour buses, no Instagram influencers. Just cobblestones, salt air, and a bakery that opens at 6am.
+
+The second is a mountain town in northern Sri Lanka where the mist rolls in every morning and the tea estate stretches for miles. I spent four days there and barely saw another foreigner.
+
+What makes these places special isn't just their beauty — it's the feeling of discovery. Of being somewhere that hasn't yet been packaged and sold.
+
+My advice: skip the top-ten lists. Ask locals. Take the unmarked road. Accept invitations from strangers. The best places aren't in any guidebook — they're found through curiosity and a willingness to get a little lost.
+
+The world is much bigger, and much quieter, than the internet would have you believe.">
       <div class="bc-thumb" style="background:linear-gradient(135deg,#e6f5d3,#c9e8a0)"><i class="fa-solid fa-map-location-dot"></i></div>
       <div class="bc-body">
         <span class="btag">Travel</span>
@@ -963,11 +1094,26 @@
           <span><i class="fa-regular fa-calendar"></i> Jan 10, 2026</span>
           <span><i class="fa-regular fa-clock"></i> 8 min read</span>
         </div>
-        <a href="#" class="bc-more">Read more <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#" class="bc-more" onclick="openBlogModal(this.closest('article'));return false;">Read more <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </article>
     <!-- card 4 -->
-    <article class="bc reveal">
+    <article class="bc reveal"
+      data-tag="Reflection"
+      data-title="Books That Changed the Way I See People"
+      data-date="Dec 22, 2025" data-read="5 min read"
+      data-bg="linear-gradient(135deg,#f5d3e6,#e8a0c9)" data-icon="fa-book-open"
+      data-content="A short list of reads that expanded my empathy, challenged my assumptions, and made me a better listener.
+
+The first book I'd recommend is one about the hidden emotional lives of strangers — how little we actually know about the people around us, and how dangerous our assumptions can be.
+
+The second changed how I think about conversation. Most of us listen to reply, not to understand. The book showed me what it means to truly hear someone — to hold space for their reality without rushing to fix or judge.
+
+The third was a memoir that taught me vulnerability is not weakness. The author shared their most difficult moments with a courage that made me reflect on how guarded I'd been in my own relationships.
+
+These books didn't teach me facts. They taught me how to feel — more accurately, more generously, more humanly.
+
+If you want to become kinder and more connected, start with the books that challenge you to see the world from eyes that aren't your own.">
       <div class="bc-thumb" style="background:linear-gradient(135deg,#f5d3e6,#e8a0c9)"><i class="fa-solid fa-book-open"></i></div>
       <div class="bc-body">
         <span class="btag">Reflection</span>
@@ -977,9 +1123,10 @@
           <span><i class="fa-regular fa-calendar"></i> Dec 22, 2025</span>
           <span><i class="fa-regular fa-clock"></i> 5 min read</span>
         </div>
-        <a href="#" class="bc-more">Read more <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#" class="bc-more" onclick="openBlogModal(this.closest('article'));return false;">Read more <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </article>
+  </div>
   </div>
 </section>
 
@@ -1061,19 +1208,19 @@
       <h3>Find me here</h3>
       <div class="cd">
         <div class="cd-icon"><i class="fa-solid fa-envelope"></i></div>
-        <div><span class="cd-lbl">Email</span><a href="mailto:hello@jameskamerun.com">hello@jameskamerun.com</a></div>
+        <div><span class="cd-lbl">Email</span><a href="mailto:hello@jameskamerun.com">chanukanimsarablog@gmail.com</a></div>
       </div>
       <div class="cd">
         <div class="cd-icon"><i class="fa-brands fa-instagram"></i></div>
-        <div><span class="cd-lbl">Instagram</span><a href="#">@jameskamerun</a></div>
+        <div><span class="cd-lbl">Instagram</span><a href="#">@chanukanimsara</a></div>
       </div>
       <div class="cd">
-        <div class="cd-icon"><i class="fa-brands fa-x-twitter"></i></div>
-        <div><span class="cd-lbl">Twitter / X</span><a href="#">@jameskamerun</a></div>
+        <div class="cd-icon"><i class="fa-brands fa-x" style="font-size:16px;"></i></div>
+        <div><span class="cd-lbl">Twitter / X</span><a href="#">@chanukanimsara</a></div>
       </div>
       <div class="cd">
         <div class="cd-icon"><i class="fa-brands fa-linkedin-in"></i></div>
-        <div><span class="cd-lbl">LinkedIn</span><a href="#">James Kamerun</a></div>
+        <div><span class="cd-lbl">LinkedIn</span><a href="#">Chanuka Nimsara</a></div>
       </div>
       <div class="avail">
         <span class="avail-dot"></span>
@@ -1113,6 +1260,32 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════════ GALLERY POPUP MODAL ═══════════════ -->
+<div class="g-modal-overlay" id="galleryModal" onclick="if(event.target===this)closeGalleryModal()">
+  <div class="g-modal" style="position:relative;">
+    <button class="g-modal-close" onclick="closeGalleryModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="g-modal-thumb" id="gModalThumb"></div>
+    <div class="g-modal-body">
+      <div class="g-modal-cat" id="gModalCat"></div>
+      <h3 id="gModalTitle"></h3>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ BLOG POST POPUP MODAL ═══════════════ -->
+<div class="blog-modal-overlay" id="blogModal" onclick="if(event.target===this)closeBlogModal()">
+  <div class="blog-modal" style="position:relative;">
+    <button class="blog-modal-close" onclick="closeBlogModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="blog-modal-hero" id="bModalHero"></div>
+    <div class="blog-modal-body">
+      <span class="btag" id="bModalTag"></span>
+      <h2 id="bModalTitle"></h2>
+      <div class="bc-meta" id="bModalMeta"></div>
+      <div class="post-content" id="bModalContent"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ FOOTER ═══════════════ -->
 <footer>
@@ -1308,6 +1481,73 @@ async function handleNewsletter(){
     alert("Network error. Please try again.");
   }
 }
+
+  /* ──────────────────────────────────────────────
+     GALLERY POPUP
+  ────────────────────────────────────────────── */
+  function openGalleryModal(el) {
+    const title = el.dataset.title;
+    const cat   = el.dataset.cat;
+    const bg    = el.dataset.bg;
+    const icon  = el.dataset.icon;
+
+    document.getElementById('gModalThumb').style.background = bg;
+    document.getElementById('gModalThumb').innerHTML = `<i class="fa-solid ${icon}" style="font-size:64px;color:rgba(255,255,255,.75);"></i>`;
+    document.getElementById('gModalTitle').textContent = title;
+    document.getElementById('gModalCat').textContent = cat;
+
+    const modal = document.getElementById('galleryModal');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGalleryModal() {
+    document.getElementById('galleryModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* ──────────────────────────────────────────────
+     BLOG POST POPUP
+  ────────────────────────────────────────────── */
+  function openBlogModal(article) {
+    const tag     = article.dataset.tag;
+    const title   = article.dataset.title;
+    const date    = article.dataset.date;
+    const read    = article.dataset.read;
+    const bg      = article.dataset.bg;
+    const icon    = article.dataset.icon;
+    const content = article.dataset.content;
+
+    document.getElementById('bModalHero').style.background = bg;
+    document.getElementById('bModalHero').innerHTML = `<i class="fa-solid ${icon}" style="font-size:64px;color:rgba(255,255,255,.75);"></i>`;
+    document.getElementById('bModalTag').textContent = tag;
+    document.getElementById('bModalTitle').textContent = title;
+    document.getElementById('bModalMeta').innerHTML =
+      `<span><i class="fa-regular fa-calendar"></i> ${date}</span>
+       &nbsp;&nbsp;<span><i class="fa-regular fa-clock"></i> ${read}</span>`;
+
+    // Format content: split by double newlines into paragraphs
+    const paragraphs = content.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    document.getElementById('bModalContent').innerHTML = paragraphs;
+
+    const modal = document.getElementById('blogModal');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.blog-modal').scrollTop = 0;
+  }
+
+  function closeBlogModal() {
+    document.getElementById('blogModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close modals on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeGalleryModal();
+      closeBlogModal();
+    }
+  });
 
   /* Back to top + Let's Talk */
   const backToTop = document.getElementById('backToTop');
