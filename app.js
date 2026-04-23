@@ -99,6 +99,16 @@ app.post('/send-message', async (req, res) => {
     return res.status(400).json({ success: false, error: 'All fields are required.' });
 
   try {
+    // Save contact message to Firestore
+    await db.collection('contacts').add({
+      name,
+      email,
+      subject,
+      message,
+      read: false,
+      received_at: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     await transporter.sendMail({
       from:    `"${name}" <${process.env.GMAIL_USER}>`,
       to:      process.env.GMAIL_USER,
@@ -123,6 +133,46 @@ app.post('/send-message', async (req, res) => {
   } catch (err) {
     console.error('Contact email error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to send email.' });
+  }
+});
+
+// ─── Get Contact Messages (admin) ─────────────────────────────
+app.get('/admin/contacts', authMiddleware, async (req, res) => {
+  try {
+    const snap = await db.collection('contacts')
+      .orderBy('received_at', 'desc')
+      .get();
+    const contacts = snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      received_at: doc.data().received_at?.toDate().toISOString() || null,
+    }));
+    res.json({ success: true, contacts, total: contacts.length, unread: contacts.filter(c => !c.read).length });
+  } catch (err) {
+    console.error('Get contacts error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch contacts.' });
+  }
+});
+
+// ─── Mark Contact as Read ──────────────────────────────────────
+app.patch('/admin/contacts/:id/read', authMiddleware, async (req, res) => {
+  try {
+    await db.collection('contacts').doc(req.params.id).update({ read: true });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Mark read error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update.' });
+  }
+});
+
+// ─── Delete Contact Message ────────────────────────────────────
+app.delete('/admin/contacts/:id', authMiddleware, async (req, res) => {
+  try {
+    await db.collection('contacts').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete contact error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete.' });
   }
 });
 

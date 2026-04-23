@@ -441,6 +441,10 @@
     <button class="sb-link" data-page="subscribers" onclick="switchPage('subscribers',this)">
       <i class="fa-solid fa-users"></i> Subscribers
     </button>
+    <button class="sb-link" data-page="contacts" onclick="switchPage('contacts',this)" id="sbContactsBtn">
+      <i class="fa-solid fa-envelope-open-text"></i> Contact Messages
+      <span id="sbUnreadBadge" style="display:none;margin-left:auto;background:#ef4444;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;line-height:18px;"></span>
+    </button>
     <div class="sb-sep"></div>
     <button class="sb-link" data-page="newsletter" onclick="switchPage('newsletter',this)">
       <i class="fa-solid fa-paper-plane"></i> Send Newsletter
@@ -574,6 +578,52 @@
               <tr class="empty-row"><td colspan="4"><div class="empty-icon">📭</div><div>Loading…</div></td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ PAGE: CONTACTS ═══ -->
+    <div class="page" id="page-contacts">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn btn-outline" style="padding:8px 16px;font-size:13px;" onclick="loadContacts();showToast('Refreshed!','success');">
+              <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Subject</th><th>Received</th><th>Action</th></tr></thead>
+            <tbody id="contactsTable">
+              <tr class="empty-row"><td colspan="6"><div class="empty-icon">📬</div><div>Loading…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="contactModal" class="confirm-overlay" style="display:none;" onclick="if(event.target===this)closeContactModal()">
+        <div class="confirm-box" style="max-width:600px;width:95%;max-height:85vh;overflow-y:auto;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <h3 style="margin:0;font-size:17px;" id="modalSubject"></h3>
+            <button onclick="closeContactModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);padding:4px;"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div style="background:var(--bg-alt);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">FROM</div><div id="modalName" style="font-weight:600;"></div></div>
+            <div style="background:var(--bg-alt);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">EMAIL</div><a id="modalEmail" href="#" style="color:var(--accent);font-weight:500;"></a></div>
+          </div>
+          <div style="background:var(--bg-alt);border-radius:8px;padding:16px;margin-bottom:16px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">MESSAGE</div>
+            <div id="modalMessage" style="line-height:1.7;white-space:pre-wrap;"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div id="modalDate" style="font-size:12px;color:var(--text-muted);"></div>
+            <div style="display:flex;gap:10px;">
+              <a id="modalReply" href="#" class="btn" style="padding:8px 16px;font-size:13px;text-decoration:none;"><i class="fa-solid fa-reply"></i> Reply</a>
+              <button id="modalDeleteBtn" class="btn" style="padding:8px 16px;font-size:13px;background:#ef4444;" onclick="deleteCurrentContact()"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -741,7 +791,7 @@
   setInterval(updateClock, 1000);     // then every second
 
   // ── Page switching ────────────────────────────────────────────
-  const pageTitles = { overview: 'Overview', subscribers: 'Subscribers', newsletter: 'Send Newsletter' };
+  const pageTitles = { overview: 'Overview', subscribers: 'Subscribers', contacts: 'Contact Messages', newsletter: 'Send Newsletter' };
 
   function switchPage(name, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -756,6 +806,7 @@
     }
 
     if (name === 'subscribers') renderSubsTable();
+    if (name === 'contacts') loadContacts();
   }
 
   // ── Sidebar helpers ───────────────────────────────────────────
@@ -951,11 +1002,109 @@
     window.location.href = '/admin-login.html';
   }
 
+  // ── Contact Messages ──────────────────────────────────────────
+  let allContacts = [];
+  let currentContactId = null;
+
+  async function loadContacts() {
+    const data = await api('/admin/contacts');
+    if (!data.success) return;
+    allContacts = data.contacts;
+
+    // Update unread badge on sidebar button
+    const badge = document.getElementById('sbUnreadBadge');
+    if (data.unread > 0) {
+      badge.style.display = '';
+      badge.textContent = data.unread;
+    } else {
+      badge.style.display = 'none';
+    }
+
+    renderContactsTable();
+  }
+
+  function renderContactsTable() {
+    const tbody = document.getElementById('contactsTable');
+    if (!tbody) return;
+    tbody.innerHTML = allContacts.length ? allContacts.map((c, i) => `
+      <tr id="crow-${c.id}" style="${!c.read ? 'font-weight:600;' : ''}">
+        <td>${i + 1}</td>
+        <td>${escHtml(c.name || '')}</td>
+        <td class="email-cell">${escHtml(c.email || '')}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(c.subject || '')}</td>
+        <td class="date-cell">${fmtDate(c.received_at)}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;" onclick="openContactModal('${c.id}')">
+            <i class="fa-solid fa-eye"></i> View
+          </button>
+          <button class="btn-del" onclick="deleteContact('${c.id}')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>`).join('') :
+      `<tr class="empty-row"><td colspan="6"><div class="empty-icon">📬</div><div>No contact messages yet.</div></td></tr>`;
+  }
+
+  function openContactModal(id) {
+    const c = allContacts.find(x => x.id === id);
+    if (!c) return;
+    currentContactId = id;
+    document.getElementById('modalSubject').innerHTML = `<i class="fa-solid fa-envelope-open-text" style="color:var(--accent);margin-right:8px;"></i>${escHtml(c.subject || '')}`;
+    document.getElementById('modalName').textContent = c.name || '';
+    const emailEl = document.getElementById('modalEmail');
+    emailEl.textContent = c.email || '';
+    emailEl.href = 'mailto:' + (c.email || '');
+    document.getElementById('modalMessage').textContent = c.message || '';
+    document.getElementById('modalDate').textContent = 'Received: ' + fmtDate(c.received_at);
+    document.getElementById('modalReply').href = `mailto:${c.email}?subject=Re: ${encodeURIComponent(c.subject || '')}`;
+    const modal = document.getElementById('contactModal');
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    // Mark as read
+    if (!c.read) {
+      api('/admin/contacts/' + id + '/read', 'PATCH').then(() => {
+        c.read = true;
+        const row = document.getElementById('crow-' + id);
+        if (row) row.style.fontWeight = '';
+        const badge = document.getElementById('sbUnreadBadge');
+        const unread = allContacts.filter(x => !x.read).length;
+        if (unread > 0) { badge.style.display=''; badge.textContent=unread; } else { badge.style.display='none'; }
+      });
+    }
+  }
+
+  function closeContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+    currentContactId = null;
+  }
+
+  async function deleteCurrentContact() {
+    if (!currentContactId) return;
+    await deleteContact(currentContactId);
+    closeContactModal();
+  }
+
+  async function deleteContact(id) {
+    const data = await api('/admin/contacts/' + id, 'DELETE');
+    if (data.success) {
+      allContacts = allContacts.filter(c => c.id !== id);
+      renderContactsTable();
+      const badge = document.getElementById('sbUnreadBadge');
+      const unread = allContacts.filter(c => !c.read).length;
+      if (unread > 0) { badge.style.display=''; badge.textContent=unread; } else { badge.style.display='none'; }
+      showToast('Message deleted.', 'success');
+    } else {
+      showToast('Delete failed.', 'error');
+    }
+  }
+
   // ── Real-time polling every 10 seconds ────────────────────────
   setInterval(loadData, 10000);
 
   // ── Init ──────────────────────────────────────────────────────
   loadData();
+  loadContacts();
 </script>
 </body>
 </html>
