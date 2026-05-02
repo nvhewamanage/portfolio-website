@@ -715,6 +715,82 @@
           </div>
         </div>
       </div>
+
+      <!-- Newsletter History -->
+      <div class="panel" style="margin-top:24px;">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Sent Newsletter History</div>
+          <button class="btn btn-outline" style="padding:8px 16px;font-size:13px;" onclick="loadNewsletterHistory();showToast('Refreshed!','success');">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Subject</th>
+                <th>Heading</th>
+                <th>Recipients</th>
+                <th>Sent By</th>
+                <th>Sent At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="newsletterHistoryTable">
+              <tr class="empty-row"><td colspan="7"><div class="empty-icon">📨</div><div>No newsletters sent yet.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Newsletter Detail Modal -->
+      <div id="nlModal" class="confirm-overlay" style="display:none;" onclick="if(event.target===this)closeNlModal()">
+        <div class="confirm-box" style="max-width:640px;width:95%;max-height:85vh;overflow-y:auto;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <h3 style="margin:0;font-size:17px;display:flex;align-items:center;gap:10px;">
+              <i class="fa-solid fa-envelope" style="color:var(--accent);"></i>
+              <span id="nlModalSubject"></span>
+            </h3>
+            <button onclick="closeNlModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);padding:4px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div style="background:var(--bg-alt);border-radius:8px;padding:12px;">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">RECIPIENTS</div>
+              <div id="nlModalRecipients" style="font-weight:700;font-size:20px;color:var(--accent);"></div>
+            </div>
+            <div style="background:var(--bg-alt);border-radius:8px;padding:12px;">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">SENT BY</div>
+              <div id="nlModalSentBy" style="font-weight:600;"></div>
+            </div>
+            <div style="background:var(--bg-alt);border-radius:8px;padding:12px;">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">SENT AT</div>
+              <div id="nlModalSentAt" style="font-weight:600;font-size:12px;"></div>
+            </div>
+          </div>
+          <div style="background:var(--bg-alt);border-radius:8px;padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">HEADING</div>
+            <div id="nlModalHeading" style="font-weight:700;font-size:16px;"></div>
+          </div>
+          <div id="nlModalPreviewWrap" style="background:var(--bg-alt);border-radius:8px;padding:14px;margin-bottom:12px;display:none;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">PREVIEW TEXT</div>
+            <div id="nlModalPreview" style="font-size:13px;color:var(--text-muted);font-style:italic;"></div>
+          </div>
+          <div style="background:var(--bg-alt);border-radius:8px;padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">BODY</div>
+            <div id="nlModalBody" style="line-height:1.7;white-space:pre-wrap;font-size:14px;"></div>
+          </div>
+          <div id="nlModalCtaWrap" style="background:var(--bg-alt);border-radius:8px;padding:14px;display:none;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">CTA BUTTON</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span id="nlModalCtaText" style="font-weight:600;"></span>
+              <a id="nlModalCtaUrl" href="#" target="_blank" style="color:var(--accent);font-size:12px;word-break:break-all;"></a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div><!-- /content -->
@@ -807,6 +883,7 @@
 
     if (name === 'subscribers') renderSubsTable();
     if (name === 'contacts') loadContacts();
+    if (name === 'newsletter') loadNewsletterHistory();
   }
 
   // ── Sidebar helpers ───────────────────────────────────────────
@@ -967,6 +1044,7 @@
       document.getElementById('statSentCount').textContent = newslettersSentThisSession;
       showToast(`✅ Newsletter sent to ${data.sent} subscribers!`, 'success');
       clearNLForm();
+      loadNewsletterHistory();
     } else {
       showToast('Send failed: ' + (data.error || 'Unknown error'), 'error');
     }
@@ -1099,12 +1177,79 @@
     }
   }
 
+  // ── Newsletter History ─────────────────────────────────────────
+  let allNewsletters = [];
+
+  async function loadNewsletterHistory() {
+    const data = await api('/admin/newsletters');
+    if (!data.success) return;
+    allNewsletters = data.newsletters;
+    renderNewsletterHistory();
+  }
+
+  function renderNewsletterHistory() {
+    const tbody = document.getElementById('newsletterHistoryTable');
+    if (!tbody) return;
+    tbody.innerHTML = allNewsletters.length ? allNewsletters.map((n, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(n.subject)}">${escHtml(n.subject)}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(n.heading)}">${escHtml(n.heading)}</td>
+        <td><span class="badge badge-green">${n.sent_count} sent</span></td>
+        <td>${escHtml(n.sent_by || 'admin')}</td>
+        <td class="date-cell">${fmtDate(n.sent_at)}</td>
+        <td>
+          <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;" onclick="openNlModal('${n.id}')">
+            <i class="fa-solid fa-eye"></i> View
+          </button>
+        </td>
+      </tr>`).join('') :
+      `<tr class="empty-row"><td colspan="7"><div class="empty-icon">📨</div><div>No newsletters sent yet.</div></td></tr>`;
+  }
+
+  function openNlModal(id) {
+    const n = allNewsletters.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('nlModalSubject').textContent = n.subject;
+    document.getElementById('nlModalRecipients').textContent = n.sent_count;
+    document.getElementById('nlModalSentBy').textContent = n.sent_by || 'admin';
+    document.getElementById('nlModalSentAt').textContent = fmtDate(n.sent_at);
+    document.getElementById('nlModalHeading').textContent = n.heading;
+    document.getElementById('nlModalBody').textContent = n.body;
+    const previewWrap = document.getElementById('nlModalPreviewWrap');
+    if (n.preview_text) {
+      previewWrap.style.display = '';
+      document.getElementById('nlModalPreview').textContent = n.preview_text;
+    } else {
+      previewWrap.style.display = 'none';
+    }
+    const ctaWrap = document.getElementById('nlModalCtaWrap');
+    if (n.cta_text && n.cta_url) {
+      ctaWrap.style.display = '';
+      document.getElementById('nlModalCtaText').textContent = n.cta_text;
+      const ctaLink = document.getElementById('nlModalCtaUrl');
+      ctaLink.textContent = n.cta_url;
+      ctaLink.href = n.cta_url;
+    } else {
+      ctaWrap.style.display = 'none';
+    }
+    const modal = document.getElementById('nlModal');
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+  }
+
+  function closeNlModal() {
+    document.getElementById('nlModal').style.display = 'none';
+  }
+
   // ── Real-time polling every 10 seconds ────────────────────────
   setInterval(loadData, 10000);
 
   // ── Init ──────────────────────────────────────────────────────
   loadData();
   loadContacts();
+  loadNewsletterHistory();
 </script>
 </body>
 </html>

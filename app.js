@@ -333,10 +333,42 @@ app.post('/admin/send-newsletter', authMiddleware, async (req, res) => {
       sent += batch.length;
     }
 
+    // ── Save newsletter record to Firestore ──────────────────────
+    await db.collection('newsletters').add({
+      subject,
+      preview_text:  previewText  || '',
+      heading,
+      body,
+      cta_text:      ctaText      || '',
+      cta_url:       ctaUrl       || '',
+      total_recipients: emails.length,
+      sent_count:    sent,
+      sent_by:       req.admin?.username || 'admin',
+      sent_at:       admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     res.json({ success: true, sent });
   } catch (err) {
     console.error('Newsletter error:', err.message);
     res.status(500).json({ success: false, error: 'Newsletter send failed.' });
+  }
+});
+
+// ─── Get Newsletter History (admin) ───────────────────────────
+app.get('/admin/newsletters', authMiddleware, async (req, res) => {
+  try {
+    const snap = await db.collection('newsletters')
+      .orderBy('sent_at', 'desc')
+      .get();
+    const newsletters = snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      sent_at: doc.data().sent_at?.toDate().toISOString() || null,
+    }));
+    res.json({ success: true, newsletters, total: newsletters.length });
+  } catch (err) {
+    console.error('Get newsletters error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch newsletter history.' });
   }
 });
 
